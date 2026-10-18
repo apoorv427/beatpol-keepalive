@@ -1,0 +1,16 @@
+# Keeps the BEATPOL demo backend (Render free tier) awake: it sleeps after 15 min
+# idle, and the first login after that waits ~1 min. Public repo = free Actions
+# minutes. Note: GitHub pauses scheduled workflows after 60 days of no commits.
+name: keepalive
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping API (direct) and site (through the Vercel proxy)
+        run: |
+          curl -fsS -m 90 -o /dev/null -w "api %{http_code} %{time_total}s\n" https://beatpol-45-api.onrender.com/ || true
+          curl -fsS -m 90 -o /dev/null -w "site %{http_code} %{time_total}s\n" https://beatpol.blueleaf-ais.com/ || true
